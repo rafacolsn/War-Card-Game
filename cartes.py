@@ -53,10 +53,37 @@ def askName():
     global j1
     j1 = Joueur(reply)
 
-askName()
-j2 = Joueur("Ordi")
-j1.battre()
-j2.battre()
+def gagne(joueur):
+    print joueur+" a gagne"
+
+def bataille(carte1, carte2):
+    if carte1[0] > carte2[0]:
+        print carte1 + " est plus grand que " + carte2
+        gagne(j1.nom)
+        confirm = yes_or_no("On continue ?")
+        if confirm:
+            c3 = j1.tirerCarte(2)
+            c4 = j2.tirerCarte(2)
+            print "la nouvelle carte de j1 est " + c3 + " et celle de j2 est " + c4
+            bataille(c3, c4)
+            
+
+    elif carte1[0] < carte2[0]:
+        print carte1 + " est plus petit que " + carte2
+        gagne(j2.nom)
+        confirm = yes_or_no("On continue ?")
+        if confirm:
+            c3 = j1.tirerCarte(2)
+            c4 = j2.tirerCarte(2)
+            print "la nouvelle carte de " + j1.nom + " est " + c3 + " et celle de " + j2.nom + " est " + c4
+            bataille(c3, c4)
+
+    else:
+        print "!!! egalite !!!"
+        c3 = j1.tirerCarte(2)
+        c4 = j2.tirerCarte(2)
+        print "la nouvelle carte de " + j1.nom + " est " + c3 + " et celle de " + j2.nom + " est " + c4
+        bataille(c3, c4)
 
 def yes_or_no(question):
     reply = str(raw_input(question+' (o/n): ')).lower().strip()
@@ -67,6 +94,10 @@ def yes_or_no(question):
     else:
         return yes_or_no("Uhhhh... please enter ")
 
+askName()
+j2 = Joueur("Ordi")
+j1.battre()
+j2.battre()
 confirm = yes_or_no("{0}, voulez-vous jouer ?".format(j1.nom))
 
 if confirm:
@@ -74,6 +105,7 @@ if confirm:
     c2 = j2.tirerCarte(1)
     print("{0}, votre carte est : {1}".format(j1.nom, c1))
     print("La carte de {0} est : {1}".format(j2.nom, c2))
+    bataille(c1, c2)
 
 
 
