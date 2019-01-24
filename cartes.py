@@ -23,6 +23,7 @@ listeRangs = {
 }
 carte1 = ""
 carte2 = ""
+apresEgalite = False
 
 #Constructeur de carte
 class Carte:
@@ -80,6 +81,7 @@ class Joueur(Jeu):
     def __init__(self, nom):
         Jeu.__init__(self)
         self.nom = nom
+        self.points = 0
 
 def askName():
     """Demander le nom du premier joueur et construire son jeu"""
@@ -89,36 +91,50 @@ def askName():
 
 def gagne(joueur):
     """Afficher le gagnant"""
-    print (joueur+" a gagné")
+    print (joueur.nom +" a gagné,\n")
+    print ("{0} a {1} point(s) et {2} a {3} point(s)".format(j1.nom, j1.points, j2.nom, j2.points))
 
 def batailleSuite(n):
-    confirm = yes_or_no("On continue ?")
+    confirm = yes_or_no("\nOn continue ?")
     if confirm:
         bataille(n+1)
 
 def egalite(n):
+    print("2 points en suspend")
     bataille(n+1)
 
 def bataille(n):
     """Lancer la bataille entre 2 cartes"""
+    global apresEgalite
     carte1 = j1.tirerCarte(n)
     c1Valeur = j1.jeu[carte1]
     carte2 = j2.tirerCarte(n)
     c2Valeur = j2.jeu[carte2]
-    print("{0}, votre carte est : {1}".format(j1.nom, carte1))
+    print("\n{0}, votre carte est : {1}".format(j1.nom, carte1))
     print("La carte de {0} est : {1}".format(j2.nom, carte2))
     if c1Valeur > c2Valeur:
-        print (carte1 + " est plus grand que " + carte2)
-        gagne(j1.nom)
+        print ("\n" + carte1 + " est plus grand que " + carte2)
+        if apresEgalite:
+            j1.points += 3
+            apresEgalite = False
+        else:
+            j1.points +=1
+        gagne(j1)
         batailleSuite(n)
 
     elif c1Valeur < c2Valeur:
         print (carte1 + " est plus petit que " + carte2)
-        gagne(j2.nom)
+        if apresEgalite:
+            j2.points += 3
+            apresEgalite = False
+        else:
+            j2.points +=1
+        gagne(j2)
         batailleSuite(n)
 
     else:
         print ("!!! egalite !!!")
+        apresEgalite = True
         egalite(n)
 
 def yes_or_no(question):
@@ -140,6 +156,4 @@ confirm = yes_or_no("{0}, voulez-vous jouer ?".format(j1.nom))
 
 if confirm:
     bataille(0)
-
-
 
