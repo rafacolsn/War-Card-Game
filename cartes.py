@@ -1,47 +1,80 @@
+## Ceci est un script pour jouer à la bataille
+## Codé par Raphaël Colson en janvier 2019
+
 from random import *
 import random
 
-listeCouleurs = ["Coeur", "Carreau", "Trefle", "Pique"]
-listeValeurs = [2, 3, 4, 5, 6, 7, 8, 9, 10, "Valet", "Dame", "Roi", "As"]
+##Initiation des dictionnaires avec les valeurs des cartes pour la bataille
+listeCouleurs = ["♠", "♥", "♦", "♣"]
+listeRangs = {
+    "2":2,
+    "3":3,
+    "4":4,
+    "5":5,
+    "6":6,
+    "7":7,
+    "8":8,
+    "9":9,
+    "10":10,
+    "Valet": 11,
+    "Dame": 12,
+    "Roi": 13,
+    "As":14
+}
+carte1 = ""
+carte2 = ""
 
+#Constructeur de carte
 class Carte:
     """Classe de cartes"""
-    def __init__(self, couleur, valeur):
-        self.c = couleur
-        self.v = valeur
-        self.nom = "{0} de {1}".format(self.v, self.c)
+    def __init__(self, couleur, rang, valeur):
+        self.couleur = couleur
+        self.rang = rang
+        self.valeur = valeur
+        self.nom = "{0} de {1}".format(self.rang, self.couleur)
 
+#Constructeur d'un jeu de carte
 class Jeu:
     """Classe du jeu de cartes"""
     def __init__(self):
-        self.jeu = []
+        self.jeu = {}
+        self.listeDuJeu = []
         for couleur in listeCouleurs: 
-            for valeur in listeValeurs:
-                c = Carte(couleur, valeur)
-                self.jeu.append(c.nom)
-    
-    def afficher(self):
+            for cleRang, valeurRang in listeRangs.items():
+                rang = cleRang
+                valeur = valeurRang
+                carte = Carte(couleur, rang, valeur)
+                self.jeu[carte.nom] = valeur
+                self.listeDuJeu.append(carte.nom)
+
+    def afficherValeurs(self):
+        """Afficher le jeu construit"""
         print(self.jeu)
 
     def battre(self):
-        random.shuffle(self.jeu)
+        """Mélanger le jeu"""
+        random.shuffle(self.listeDuJeu)
 
     def tirerJeu(self):
+        """Tirer les cartes du jeu une à une"""
         i = 0
         while i < 52:
-            print(self.jeu[i])
+            print(self.listeDuJeu[i])
             i += 1
     
-    # def tirerCartesAuHasard(self, nbr):
-    #     i = 1
-    #     while i <= nbr:
-    #         r = randint(0,51)
-    #         print(self.jeu[r])
-    #         i += 1
+    def tirerCartesAuHasard(self, nbr):
+        """Tirer une carte au hasard"""
+        i = 1
+        while i <= nbr:
+            r = randint(0,51)
+            print(self.listeDuJeu[r])
+            i += 1
 
     def tirerCarte(self, n):
-        return self.jeu[n]
+        """Tirer la carte suivante"""
+        return self.listeDuJeu[n]
 
+#Constructeur d'un joueur et de son jeu
 class Joueur(Jeu):
     """Classe des joueurs"""
     def __init__(self, nom):
@@ -49,51 +82,56 @@ class Joueur(Jeu):
         self.nom = nom
 
 def askName():
-    reply = str(raw_input("Quel est votre nom ? "))
+    """Demander le nom du premier joueur et construire son jeu"""
+    reply = str(input("Quel est votre nom ? "))
     global j1
     j1 = Joueur(reply)
 
 def gagne(joueur):
-    print joueur+" a gagne"
+    """Afficher le gagnant"""
+    print (joueur+" a gagné")
 
-def bataille(carte1, carte2):
-    if carte1[0] > carte2[0]:
-        print carte1 + " est plus grand que " + carte2
+def batailleSuite(n):
+    confirm = yes_or_no("On continue ?")
+    if confirm:
+        bataille(n+1)
+
+def egalite(n):
+    bataille(n+1)
+
+def bataille(n):
+    """Lancer la bataille entre 2 cartes"""
+    carte1 = j1.tirerCarte(n)
+    c1Valeur = j1.jeu[carte1]
+    carte2 = j2.tirerCarte(n)
+    c2Valeur = j2.jeu[carte2]
+    print("{0}, votre carte est : {1}".format(j1.nom, carte1))
+    print("La carte de {0} est : {1}".format(j2.nom, carte2))
+    if c1Valeur > c2Valeur:
+        print (carte1 + " est plus grand que " + carte2)
         gagne(j1.nom)
-        confirm = yes_or_no("On continue ?")
-        if confirm:
-            c3 = j1.tirerCarte(2)
-            c4 = j2.tirerCarte(2)
-            print "la nouvelle carte de j1 est " + c3 + " et celle de j2 est " + c4
-            bataille(c3, c4)
-            
+        batailleSuite(n)
 
-    elif carte1[0] < carte2[0]:
-        print carte1 + " est plus petit que " + carte2
+    elif c1Valeur < c2Valeur:
+        print (carte1 + " est plus petit que " + carte2)
         gagne(j2.nom)
-        confirm = yes_or_no("On continue ?")
-        if confirm:
-            c3 = j1.tirerCarte(2)
-            c4 = j2.tirerCarte(2)
-            print "la nouvelle carte de " + j1.nom + " est " + c3 + " et celle de " + j2.nom + " est " + c4
-            bataille(c3, c4)
+        batailleSuite(n)
 
     else:
-        print "!!! egalite !!!"
-        c3 = j1.tirerCarte(2)
-        c4 = j2.tirerCarte(2)
-        print "la nouvelle carte de " + j1.nom + " est " + c3 + " et celle de " + j2.nom + " est " + c4
-        bataille(c3, c4)
+        print ("!!! egalite !!!")
+        egalite(n)
 
 def yes_or_no(question):
-    reply = str(raw_input(question+' (o/n): ')).lower().strip()
+    """Demander une confirmation"""
+    reply = str(input(question+' (o/n): ')).lower().strip()
     if reply[0] == 'o':
         return True
     if reply[0] == 'n':
         return False
     else:
-        return yes_or_no("Uhhhh... please enter ")
+        return yes_or_no("Oh lalala... il me faut un oui ou non ")
 
+#Lancement du script pour jouer une partie de bataille
 askName()
 j2 = Joueur("Ordi")
 j1.battre()
@@ -101,12 +139,7 @@ j2.battre()
 confirm = yes_or_no("{0}, voulez-vous jouer ?".format(j1.nom))
 
 if confirm:
-    c1 = j1.tirerCarte(1)
-    c2 = j2.tirerCarte(1)
-    print("{0}, votre carte est : {1}".format(j1.nom, c1))
-    print("La carte de {0} est : {1}".format(j2.nom, c2))
-    bataille(c1, c2)
-
+    bataille(0)
 
 
 
