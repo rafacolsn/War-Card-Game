@@ -2,7 +2,6 @@
 ## Codé par Raphaël Colson en janvier 2019
 
 from random import *
-import random
 
 ##Initiation des dictionnaires avec les valeurs des cartes pour la bataille
 listeCouleurs = ["♠", "♥", "♦", "♣"]
@@ -54,7 +53,7 @@ class Jeu:
 
     def battre(self):
         """Mélanger le jeu"""
-        random.shuffle(self.listeDuJeu)
+        shuffle(self.listeDuJeu)
 
     def tirerJeu(self):
         """Tirer les cartes du jeu une à une"""
